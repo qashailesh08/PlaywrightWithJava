@@ -1,0 +1,16 @@
+package pages;
+
+import org.testng.annotations.Test;
+
+import base.BaseTest;
+
+public class DemoTest extends BaseTest{
+
+	
+	
+	
+	@Test
+	public void test_001_demoBlaze() {
+		
+	}
+}

@@ -1,0 +1,49 @@
+package test;
+
+import java.util.List;
+
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+
+public class FirstTest {
+
+	public static void main(String[] args) {
+		try (Playwright play = Playwright.create()) {
+			Browser browser = play.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+			Page page = browser.newPage();
+			page.navigate("https://www.flipkart.com/");
+
+			System.out.println(page.title());
+
+			Locator searchBox = page.locator("(//input[@name='q'])[1]");
+
+			searchBox.clear();
+			searchBox.fill("Shoes for men");
+
+			// list of price of all product are displayed
+			List<Locator> lisPrice = page.locator("//div[@class='hZ3P6w']").all();
+
+			// List of percentage of all product are displayed
+
+			List<Locator> listPerce = page.locator("//div[@class='HQe8jr']/span").all();
+			
+			for (int i = 0; i < lisPrice.size(); i++) {
+				
+				Locator wePrice=lisPrice.get(i);
+				
+				
+				
+				
+				
+			}
+
+//			browser.close();
+
+		}
+
+	}
+
+}

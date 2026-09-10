@@ -1,0 +1,16 @@
+package com.eva.webutil;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+
+public class ReportManager {
+	private static ExtentReports exReportObj;
+	private static ExtentReports extent;
+
+	public void getInstance() {
+		
+		ExtentSparkReporter exp=new ExtentSparkReporter("test-output/Extends.html");
+		exp
+	}
+
+}

@@ -1,0 +1,11 @@
+package com.eva.webutil;
+
+public class getSnapeShots {
+	
+	
+	
+	public static void getSnape() {
+		
+	}
+
+}

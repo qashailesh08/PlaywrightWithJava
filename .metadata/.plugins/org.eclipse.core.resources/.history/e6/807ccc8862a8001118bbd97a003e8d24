@@ -1,0 +1,13 @@
+package pages;
+
+import base.BaseTest;
+
+public class DemoTest extends BaseTest{
+
+	
+	
+	
+	public void test_001_demoBlaze() {
+		
+	}
+}

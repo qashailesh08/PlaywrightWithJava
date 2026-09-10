@@ -1,0 +1,23 @@
+package com.practice;
+
+public class SecondLarginArr {
+
+	public static void main(String[] args) {
+
+	}
+
+	public void check_first_large() {
+		int[] num = { 12, 5, 232, 46, 2 };
+
+		int large = 0;
+		for (int i = 0; i < num.length; i++) {
+			for (int j = 1; j < num.length; j++) {
+				if (num[i] == num[j]) {
+
+				}
+			}
+
+		}
+	}
+
+}

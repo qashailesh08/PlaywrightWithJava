@@ -1,0 +1,1193 @@
+package com.eva.webutil;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Dialog;
+import com.microsoft.playwright.Frame;
+import com.microsoft.playwright.FrameLocator;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.PlaywrightException;
+import com.microsoft.playwright.TimeoutError;
+import com.microsoft.playwright.options.MouseButton;
+import com.microsoft.playwright.options.SelectOption;
+import com.microsoft.playwright.options.WaitForSelectorState;
+
+/*
+ * Playwright-Java port of the original Selenium WebUtil class.
+ *
+ * Mapping notes (Selenium -> Playwright):
+ *  - WebDriver              -> Page (per-thread, held by ThreadLocal exactly like poolDriver before)
+ *  - WebElement             -> Locator (Playwright locators are lazily-resolved and auto-wait,
+ *                              so most of the retry/exception-handling that Selenium needed is no
+ *                              longer necessary - Playwright actions already wait for actionability)
+ *  - JavascriptExecutor     -> page.evaluate() / locator.evaluate()
+ *  - Actions class          -> Locator.hover()/dblclick()/dragTo(), Mouse (page.mouse())
+ *  - Select class           -> Locator.selectOption(...)
+ *  - WebDriverWait/Expected
+ *    Conditions             -> Locator.waitFor(WaitForOptions) - Playwright auto-waits on every
+ *                              action, so explicit waits are only needed for custom conditions
+ *  - Window handles         -> BrowserContext.pages() (Playwright has no window "handles"; each
+ *                              popup/tab is its own Page inside the same BrowserContext)
+ *  - Frame handling         -> Page.frameLocator(selector) / Page.frames()
+ *  - Alerts                 -> Page.onDialog(Dialog handler)
+ *
+ * Because Playwright already retries and auto-waits internally, most of the duplicated
+ * "catch specific exception, retry once" blocks from the Selenium version are collapsed into a
+ * single try/catch that logs failure to ExtentReports and rethrows - the retry itself is handled
+ * by Playwright's own actionability checks.
+ */
+public class WebUtil {
+
+	private static ExtentReports exReportObj;
+	private static WebUtil utilObj = null;
+
+	private static ThreadLocal<Playwright> poolPlaywright = new ThreadLocal<>();
+	private static ThreadLocal<Browser> poolBrowser = new ThreadLocal<>();
+	private static ThreadLocal<BrowserContext> poolContext = new ThreadLocal<>();
+	private static ThreadLocal<Page> poolPage = new ThreadLocal<>();
+	private static ThreadLocal<ExtentTest> poolReport = new ThreadLocal<>();
+
+	public Page page = null;
+
+	/*
+	 * Singleton constructor - same intent as the original: only one WebUtil
+	 * instance should exist, per-thread browser state is kept in ThreadLocals.
+	 */
+	private WebUtil() {
+	}
+
+	public static WebUtil getInstance() {
+		if (utilObj == null) {
+			utilObj = new WebUtil();
+		}
+		return utilObj;
+	}
+
+	public Page getPage() {
+		page = poolPage.get();
+		return page;
+	}
+
+	public static void setPage(Page page) {
+		poolPage.set(page);
+	}
+
+	public BrowserContext getContext() {
+		return poolContext.get();
+	}
+
+	public Browser getBrowser() {
+		return poolBrowser.get();
+	}
+
+	/*
+	 * Creates the ExtentReports instance and attaches an HTML spark reporter,
+	 * identical behaviour to the Selenium version.
+	 */
+	public synchronized static void generateReport() {
+		exReportObj = new ExtentReports();
+		File filesource = new File("Reports");
+		if (!filesource.exists()) {
+			filesource.mkdir();
+		}
+		DateFormat dfObj = new SimpleDateFormat("dd-MM-yyyy hh.mm.ss a");
+		String timeStamp = dfObj.format(new Date());
+		ExtentSparkReporter sparkReport = new ExtentSparkReporter("Reports\\" + "VtigerCRM.html" + "," + timeStamp);
+		exReportObj.attachReporter(sparkReport);
+	}
+
+	public ExtentTest getExtentTest() {
+		return poolReport.get();
+	}
+
+	public void createReport(String testCaseName) {
+		if (exReportObj == null) {
+			generateReport();
+		}
+		poolReport.set(exReportObj.createTest(testCaseName));
+	}
+
+	/*
+	 * Launches a browser by name. Playwright has three engines (chromium,
+	 * firefox, webkit) rather than one driver class per vendor. "edgebrowser"
+	 * maps to Chromium's "msedge" channel and "safaribrowser" maps to WebKit,
+	 * which is the closest Playwright equivalent to Safari.
+	 */
+	public void launchBrowser(String browserName) {
+		try {
+			Playwright playwright = Playwright.create();
+			poolPlaywright.set(playwright);
+			Browser browser;
+			switch (browserName) {
+			case "chromebrowser":
+				browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+				break;
+			case "firebrowser":
+				browser = playwright.firefox().launch(new BrowserType.LaunchOptions().setHeadless(false));
+				break;
+			case "edgebrowser":
+				browser = playwright.chromium()
+						.launch(new BrowserType.LaunchOptions().setHeadless(false).setChannel("msedge"));
+				break;
+			case "safaribrowser":
+				browser = playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(false));
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown browser: " + browserName);
+			}
+			poolBrowser.set(browser);
+			BrowserContext context = browser.newContext();
+			poolContext.set(context);
+			Page newPage = context.newPage();
+			poolPage.set(newPage);
+			getExtentTest().log(Status.INFO, browserName + ": launched succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Failed To Launched Browser");
+			throw e;
+		}
+	}
+
+	/*
+	 * Navigates the current page to the given URL.
+	 */
+	public void openUrl(String url) {
+		try {
+			getPage().navigate(url);
+			getExtentTest().log(Status.INFO, url + ": launched succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not launch : " + url);
+			throw e;
+		}
+	}
+
+	/*
+	 * Takes a screenshot of a specific locator and attaches it to the report.
+	 */
+	public void addcapture(Locator element, String elementName) {
+		getExtentTest().addScreenCaptureFromPath(getSnapShote(element, elementName));
+		getExtentTest().log(Status.INFO, "Screenshot took succesfully");
+	}
+
+	/*
+	 * Takes a screenshot of the whole page (Playwright screenshots are locator-
+	 * or page-scoped, so this overload replaces the WebDriver-wide
+	 * TakesScreenshot cast from the Selenium version).
+	 */
+	public String getSnapShote(String elementName) {
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy hh_mm_ss a");
+		String timestamp = df.format(new Date());
+		File folder = new File("snapShotes");
+		if (!folder.exists()) {
+			System.out.println(folder.mkdir());
+			getExtentTest().log(Status.INFO, "Directory created succesfully");
+		}
+		Path destPath = Paths.get("snapShotes", elementName + timestamp + ".png");
+		try {
+			getPage().screenshot(new Page.ScreenshotOptions().setPath(destPath));
+			getExtentTest().log(Status.INFO, "ScreenShote took succesfully of: " + elementName);
+		} catch (PlaywrightException e) {
+			getExtentTest().log(Status.FAIL, "Did not take screenshot ");
+			e.printStackTrace();
+		}
+		return destPath.toAbsolutePath().toString();
+	}
+
+	/*
+	 * Locator-scoped screenshot - the direct Playwright equivalent of the
+	 * Selenium WebElement screenshot.
+	 */
+	public String getSnapShote(Locator element, String elementName) {
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy hh_mm_ss a");
+		String timestamp = df.format(new Date());
+		File folder = new File("snapShotes");
+		if (!folder.exists()) {
+			System.out.println(folder.mkdir());
+			getExtentTest().log(Status.INFO, "Directory created succesfully");
+		}
+		Path destPath = Paths.get("snapShotes", elementName + timestamp + ".png");
+		try {
+			element.screenshot(new Locator.ScreenshotOptions().setPath(destPath));
+			getExtentTest().log(Status.INFO, "ScreenShot took succesfully of: " + elementName);
+		} catch (PlaywrightException e) {
+			getExtentTest().log(Status.FAIL, "Did not take screenshot ");
+			e.printStackTrace();
+		}
+		return destPath.toAbsolutePath().toString();
+	}
+
+	/*
+	 * String / int comparisons - unchanged, no Selenium dependency.
+	 */
+	public void stringValidation(String actulaValue, String excpectedValue, Locator element, String elementName) {
+		if (actulaValue.equals(excpectedValue)) {
+			getExtentTest().log(Status.PASS,
+					"actulaValue: '" + actulaValue + "' matched with excpectedValue: " + excpectedValue);
+		} else {
+			addcapture(element, elementName);
+			getExtentTest().log(Status.FAIL,
+					"actulaValue: '" + actulaValue + "' not matched with excpectedValue: '" + excpectedValue);
+		}
+	}
+
+	public void intValidation(int actulaIndex, int expectedIndex) {
+		if (actulaIndex == expectedIndex) {
+			getExtentTest().log(Status.INFO, "matched actual: " + actulaIndex + " , expected: " + expectedIndex);
+		} else {
+			getExtentTest().log(Status.WARNING, "not matched actual: " + actulaIndex + " , expected: " + expectedIndex);
+		}
+	}
+
+	/*
+	 * page.evaluate() replaces JavascriptExecutor#executeScript. Playwright
+	 * evaluates in the browser context and can pass a Locator's underlying
+	 * element handle directly as the argument.
+	 */
+	public Object executeScript(String jsFunctionBody, Locator element) {
+		return element.evaluate(jsFunctionBody);
+	}
+
+	public Object executePageScript(String jsExpression) {
+		return getPage().evaluate(jsExpression);
+	}
+
+	public void flushReport() {
+		exReportObj.flush();
+		getExtentTest().log(Status.INFO, "Test Case Flushed");
+	}
+
+	/*
+	 * scrollIntoViewIfNeeded() is Playwright's built-in equivalent of the JS
+	 * scrollIntoView() call the Selenium version had to construct by hand.
+	 */
+	public void jsScrollToElement(Locator element, String elementName) {
+		try {
+			element.scrollIntoViewIfNeeded();
+			getExtentTest().log(Status.INFO, " js scroll actions performed succesfully on-[" + elementName + "]-" + "");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform jsScrollToElement action");
+			throw e;
+		}
+	}
+
+	/*
+	 * Force a raw JS click via evaluate - kept for parity with the original
+	 * jsClick escape hatch (e.g. clicking elements covered by an overlay).
+	 */
+	public void jsClick(Locator element, String elementName) {
+		try {
+			element.evaluate("el => el.click()");
+			getExtentTest().log(Status.INFO, "jsClick action performed succesfully on-[" + elementName + "]-");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform jsClick action ");
+			throw e;
+		}
+	}
+
+	public void jssendKeys(Locator element, String input, String elementName) {
+		try {
+			element.evaluate("(el, value) => el.value = value", input);
+			getExtentTest().log(Status.INFO, "jssendKeys action performed succesfully on-[" + elementName + "]-");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform jssendKeys action ");
+			throw e;
+		}
+	}
+
+	public Object jsClear(Locator element, String elementName) {
+		try {
+			element.evaluate("el => el.value = ''");
+			getExtentTest().log(Status.INFO, "jsClear action performed succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform jsClear action");
+			throw e;
+		}
+		return null;
+	}
+
+	public Object jsGetText(Locator element, String elementName) {
+		Object obj;
+		try {
+			obj = element.evaluate("el => el.innerText");
+			getExtentTest().log(Status.INFO, "jsGetText action performed succesfully on-[" + elementName + "]-");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform jsGetTest action on-[" + elementName + "]-");
+			throw e;
+		}
+		return obj;
+	}
+
+	/*
+	 * hover() is a first-class actionable Playwright command; a manual
+	 * mouseover dispatchEvent() is no longer necessary but kept as fallback.
+	 */
+	public void jsMouseOver(Locator element, String elementName) {
+		try {
+			element.hover();
+			getExtentTest().log(Status.INFO, "jsMouseOver action performed succesfully on-[" + elementName + "]-");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not performe jsMouseOver action on-[" + elementName + "]-");
+			throw e;
+		}
+	}
+
+	public void jsDoubleClick(Locator element, String elementName) {
+		try {
+			element.dblclick();
+			getExtentTest().log(Status.INFO, "jsDoubleClick action performed succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform jsDoubleClick action");
+			throw e;
+		}
+	}
+
+	public void jsContextClick(Locator element, String elementName) {
+		element.click(new Locator.ClickOptions().setButton(MouseButton.RIGHT));
+	}
+
+	public String getCurrentURL() {
+		try {
+			return getPage().url();
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "URL not found");
+			throw e;
+		}
+	}
+
+	/*
+	 * Playwright locators representing several matches expose count()/all() -
+	 * there's no direct WebElement List equivalent needed here.
+	 */
+	public int size(Locator elements, String elementName) {
+		int size = 0;
+		try {
+			size = elements.count();
+			getExtentTest().log(Status.INFO, "Totle size found succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not find size");
+			throw e;
+		}
+		return size;
+	}
+
+	public void tableDatas(Locator elements, String elementName) {
+		try {
+			List<Locator> all = elements.all();
+			for (Locator row : all) {
+				System.out.println(row.innerText());
+			}
+		} catch (Exception e) {
+			System.out.println("Unable to find table data of- " + elementName);
+			throw e;
+		}
+	}
+
+	/*
+	 * Playwright closes a single page or the whole context/browser - there is
+	 * no separate "close current window" vs "quit the driver" distinction tied
+	 * to native OS windows.
+	 */
+	public void closeWindow() {
+		getPage().close();
+	}
+
+	public void quit(long time) {
+		try {
+			Thread.sleep(time);
+			getExtentTest().log(Status.INFO, "Browser Closed");
+		} catch (InterruptedException e) {
+			getExtentTest().log(Status.FAIL, "Did'n close browser");
+			e.printStackTrace();
+		}
+		BrowserContext context = poolContext.get();
+		if (context != null) {
+			context.close();
+		}
+		Browser browser = poolBrowser.get();
+		if (browser != null) {
+			browser.close();
+		}
+		Playwright playwright = poolPlaywright.get();
+		if (playwright != null) {
+			playwright.close();
+		}
+	}
+
+	/*
+	 * Frame handling: Playwright's FrameLocator is selector-scoped and
+	 * stateless - there's no "switchTo()" that changes the driver's focus.
+	 * Every subsequent locator built off a FrameLocator automatically targets
+	 * that frame, so callers should keep using the returned FrameLocator
+	 * instead of mutating shared driver state.
+	 */
+	public FrameLocator handleFrame(String nameOrIdSelector) {
+		try {
+			FrameLocator frameLocator = getPage().frameLocator(nameOrIdSelector);
+			getExtentTest().log(Status.INFO, "frame targeted succesfully");
+			return frameLocator;
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not target the frame");
+			throw e;
+		}
+	}
+
+	public Frame handleFrame(int index) {
+		try {
+			Frame frame = getPage().frames().get(index);
+			getExtentTest().log(Status.INFO, "frame targeted succesfully");
+			return frame;
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not target the frame");
+			throw e;
+		}
+	}
+
+	/*
+	 * Playwright has no "default content" to switch back to since frame
+	 * targeting never mutates page-level state - this is a no-op kept only for
+	 * call-site compatibility.
+	 */
+	public void defaultContent() {
+		getExtentTest().log(Status.INFO, "no-op: Playwright frame locators do not change page focus");
+	}
+
+	public String getPageSource() {
+		try {
+			String pageSource = getPage().content();
+			getExtentTest().log(Status.INFO, "Page source found succesfully");
+			return pageSource;
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not Find page source");
+			throw e;
+		}
+	}
+
+	/*
+	 * Playwright has no window "handle" string; each tab/popup is its own Page
+	 * inside the same BrowserContext, so callers should track Page objects
+	 * directly. This method returns the Page whose title matches, closest
+	 * equivalent of the original handle-hunting loop.
+	 */
+	public Page switchToWindowByTitle(String expectedWinTitle) {
+		try {
+			for (Page p : getContext().pages()) {
+				if (p.title().equals(expectedWinTitle)) {
+					getExtentTest().log(Status.PASS,
+							" [ " + p.title() + " ] matched with [ " + expectedWinTitle + " ]");
+					poolPage.set(p);
+					return p;
+				}
+			}
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not find windowes");
+			throw e;
+		}
+		return null;
+	}
+
+	public void fullScreen() {
+		getExtentTest().log(Status.WARNING,
+				"Playwright has no native fullscreen() API; set a large viewport instead, e.g. page.setViewportSize(1920, 1080)");
+	}
+
+	public void minimize() {
+		getExtentTest().log(Status.WARNING, "Playwright has no native minimize() API for a headed window");
+	}
+
+	public void maxWindow() {
+		try {
+			getPage().setViewportSize(1920, 1080);
+			getExtentTest().log(Status.INFO, "Viewport maximized Succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not maximize viewport");
+			throw e;
+		}
+	}
+
+	/*
+	 * Standard interactions. Playwright's fill/click/clear already retry and
+	 * wait for actionability, so the layered exception handling from the
+	 * Selenium version collapses to a single try/catch with a JS fallback kept
+	 * for parity.
+	 */
+	public void inputValue(Locator element, String input, String elementName) {
+		try {
+			element.fill(input);
+			getExtentTest().log(Status.INFO, " sendKeys actions performe succefully on-[" + elementName + "]-");
+		} catch (PlaywrightException e) {
+			jssendKeys(element, input, elementName);
+			getExtentTest().log(Status.INFO,
+					" after handling PlaywrightException jsSendKeys actions performed succesfully on: " + elementName);
+			addcapture(element, elementName);
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, " Did not perform sendKeys action on-[ " + elementName + " ]" + "");
+			throw e;
+		}
+	}
+
+	public void click(Locator element, String elementName) {
+		try {
+			element.click();
+			getExtentTest().log(Status.INFO, " click actions performed succesfully on-[" + elementName + "]-");
+		} catch (PlaywrightException e) {
+			jsClick(element, elementName);
+			getExtentTest().log(Status.WARNING,
+					" after handling PlaywrightException jsClick actions performed succesfully on: " + elementName);
+			addcapture(element, elementName);
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Failed to perform click action on-[" + elementName + "]-");
+			throw e;
+		}
+	}
+
+	public void clear(Locator element, String elementName) {
+		try {
+			element.clear();
+			getExtentTest().log(Status.INFO, "clear actions performed succesfully on: " + elementName);
+		} catch (PlaywrightException e) {
+			jsClear(element, elementName);
+			getExtentTest().log(Status.INFO,
+					"jsClear actions performed succesfully after handling PlaywrightException on: " + elementName);
+			addcapture(element, elementName);
+		} catch (Exception e) {
+			addcapture(element, elementName);
+			getExtentTest().log(Status.FAIL, "Did not perform clear action on: " + elementName);
+			throw e;
+		}
+	}
+
+	public String getText(Locator element, String elementName) {
+		try {
+			String text = element.innerText();
+			getExtentTest().log(Status.INFO, "Text Found Of -: " + elementName);
+			return text;
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Text not Found Of -: " + elementName);
+			getSnapShote(elementName);
+			throw e;
+		}
+	}
+
+	/*
+	 * boundingBox() is Playwright's equivalent of getLocation()/getSize() -
+	 * both are combined into a single call, unlike Selenium's separate Point
+	 * and Dimension objects.
+	 */
+	public void getLocation(Locator element, String elementName) {
+		try {
+			com.microsoft.playwright.options.BoundingBox box = element.boundingBox();
+			getExtentTest().log(Status.INFO,
+					"location found of: " + elementName + " : x: " + box.x + " , y:" + box.y);
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not found location of: " + elementName);
+			throw e;
+		}
+	}
+
+	public void getSize(Locator element, String elementName) {
+		try {
+			com.microsoft.playwright.options.BoundingBox box = element.boundingBox();
+			getExtentTest().log(Status.INFO,
+					"Size found of: " + elementName + " height: " + box.height + " , width: " + box.width);
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not find size of: " + elementName);
+			throw e;
+		}
+	}
+
+	/*
+	 * "Actions class" equivalents. Playwright locators expose most of these
+	 * directly; page.mouse() covers the low-level clickAndHold()/release()
+	 * pattern that Selenium's Actions builder needed.
+	 */
+	public void clickActions(Locator element, String elementName) {
+		try {
+			element.click();
+			getExtentTest().log(Status.INFO, "Actions click action performed succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform Actions click action");
+			throw e;
+		}
+	}
+
+	public void clickAndHold(Locator element, String elementName) {
+		try {
+			element.hover();
+			getPage().mouse().down();
+			getExtentTest().log(Status.INFO, "Actions clickAndHold action performed succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform Actions clickAndHold action");
+			throw e;
+		}
+	}
+
+	public void contextClick(Locator element, String elementName) {
+		try {
+			element.click(new Locator.ClickOptions().setButton(MouseButton.RIGHT));
+			getExtentTest().log(Status.INFO, "Actions contextClick action performed succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform Actions contextClick action");
+			throw e;
+		}
+	}
+
+	public void sendKeys(Locator element, String input, String elementName) {
+		try {
+			element.pressSequentially(input);
+			getExtentTest().log(Status.INFO, "Actions sendKeys action performed succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform Actions sendKeys action");
+			throw e;
+		}
+	}
+
+	public void doubleClick(Locator element, String elementName) {
+		try {
+			element.dblclick();
+			getExtentTest().log(Status.INFO, " doubleClick action performed succesfully on-[" + elementName + "]-");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Failed to perform doubleClick Action on-[" + elementName + "]-");
+			throw e;
+		}
+	}
+
+	public void moveToElement(Locator element, String elementName) {
+		try {
+			element.hover();
+			getExtentTest().log(Status.INFO, "Mouse Over action performed succesfully on-[" + elementName + "]-");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not perform Mouse Over action on-[" + elementName + "]-");
+			throw e;
+		}
+	}
+
+	/*
+	 * dragTo() is Playwright's built-in drag-and-drop, replacing Actions'
+	 * dragAndDrop(source, target).
+	 */
+	public void dragAndDrop(Locator sourceLocator, String sourceName, Locator targetLocator, String targetName) {
+		try {
+			sourceLocator.dragTo(targetLocator);
+			getExtentTest().log(Status.INFO, "Actions dragAndDrop action performed succesfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.INFO, "Did not perform Actions dragAndDrop action");
+			throw e;
+		}
+	}
+
+	public void release(Locator element, String elementName) {
+		try {
+			getPage().mouse().up();
+			getExtentTest().log(Status.INFO, "Actions release action performed succesfully on-[" + elementName + "]-");
+		} catch (Exception e) {
+			getExtentTest().log(Status.INFO, "Did not perform Actions release action");
+			throw e;
+		}
+	}
+
+	public void scrollToElement(Locator element, String elementName) {
+		try {
+			element.scrollIntoViewIfNeeded();
+			getExtentTest().log(Status.INFO,
+					"Actions scrollToElement action performed succesfully on-[" + elementName + "]-");
+		} catch (Exception e) {
+			getExtentTest().log(Status.INFO, "Did not perform Actions scrollToElement action");
+			throw e;
+		}
+	}
+
+	/*
+	 * Select-element handling. Playwright's selectOption() replaces Selenium's
+	 * whole Select helper class with a single typed call per selection mode.
+	 */
+	public void selectByValue(Locator dropdown, String value, String elementName) {
+		try {
+			dropdown.selectOption(value);
+			getExtentTest().log(Status.INFO, "Element selected succesfully By selectByValue");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not selected value by selectByValue");
+			throw e;
+		}
+	}
+
+	public void selectByVisibleText(Locator dropdown, String visibleValue, String elementName) {
+		try {
+			dropdown.selectOption(new SelectOption().setLabel(visibleValue));
+			getExtentTest().log(Status.INFO, "Element selected succesfully By selectByVisibleText");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not selected value by selectByVisibleText");
+			throw e;
+		}
+	}
+
+	public void selectByIndex(Locator dropdown, int index, String elementName) {
+		try {
+			dropdown.selectOption(new SelectOption().setIndex(index));
+			getExtentTest().log(Status.INFO, "Element selected succesfully By selectByIndex");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not selected value by selectByIndex");
+			throw e;
+		}
+	}
+
+	/*
+	 * Deselecting: for a multi-select, calling selectOption() with a value list
+	 * that excludes an option deselects it; passing an empty array deselects
+	 * everything. Playwright has no per-option deselect call because the whole
+	 * selection is set atomically.
+	 */
+	public void deselectByValue(Locator dropdown, String value, String elementName) {
+		try {
+			List<String> remaining = new ArrayList<>();
+			for (String v : getSelectedValues(dropdown)) {
+				if (!v.equals(value)) {
+					remaining.add(v);
+				}
+			}
+			dropdown.selectOption(remaining.toArray(new String[0]));
+			getExtentTest().log(Status.INFO, "Element deselected  By deselectByValue");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not deselected value by deselectByValue");
+			throw e;
+		}
+	}
+
+	public void deselectByVisibleText(Locator dropdown, String visibleValue, String elementName) {
+		try {
+			List<String> remaining = new ArrayList<>();
+			for (String text : getAllSelectedOption(dropdown, elementName)) {
+				if (!text.equals(visibleValue)) {
+					remaining.add(text);
+				}
+			}
+			SelectOption[] opts = remaining.stream().map(t -> new SelectOption().setLabel(t))
+					.toArray(SelectOption[]::new);
+			dropdown.selectOption(opts);
+			getExtentTest().log(Status.INFO, "element deselected succesfully by deselectByVisibleText");
+		} catch (Exception e) {
+			getExtentTest().log(Status.INFO, "Did not deselected value by deselectByVisibleText");
+		}
+	}
+
+	public void deselectByIndex(Locator dropdown, int index, String elementName) {
+		try {
+			deselectAll(dropdown, elementName);
+			getExtentTest().log(Status.INFO, "element deselected succesfully by deselectByIndex");
+		} catch (Exception e) {
+			getExtentTest().log(Status.INFO, "Did not deselected value by deselectByIndex");
+		}
+	}
+
+	public void deselectAll(Locator dropdown, String elementName) {
+		try {
+			dropdown.selectOption(new String[0]);
+			getExtentTest().log(Status.INFO, "deselectedAll actions performed succesfully on-[" + elementName + "]-");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "doesn't perform deselectAll action on-[" + elementName + "]-");
+			throw e;
+		}
+	}
+
+	private List<String> getSelectedValues(Locator dropdown) {
+		Object result = dropdown
+				.evaluate("el => Array.from(el.selectedOptions).map(o => o.value)");
+		@SuppressWarnings("unchecked")
+		List<String> values = (List<String>) result;
+		return values;
+	}
+
+	@SuppressWarnings("unchecked")
+	public String getdropdownSelectedOption(Locator dropdown, String elementName) {
+		Object result = dropdown.evaluate("el => el.options[el.selectedIndex].text");
+		return (String) result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<String> getAllSelectedOption(Locator dropdown, String elementName) {
+		Object result = dropdown
+				.evaluate("el => Array.from(el.selectedOptions).map(o => o.text)");
+		return (List<String>) result;
+	}
+
+	public List<String> getOptions(Locator dropdown, String elementName) {
+		return dropdown.locator("option").allInnerTexts();
+	}
+
+	public void isMultiple(Locator dropdown, String elementName) {
+		try {
+			boolean bln = dropdown.getAttribute("multiple") != null;
+			if (bln) {
+				getExtentTest().log(Status.INFO,
+						"dropdown is Single Multi selection dropdown of-[" + elementName + "]-");
+			} else {
+				getExtentTest().log(Status.INFO,
+						"dropdown is Single Single selection dropdownof-[" + elementName + "]-");
+			}
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not work isMultiple ");
+			throw e;
+		}
+	}
+
+	public void selectPartialValueByIndex(Locator dropdown, String elementName, String partialTextToSelect) {
+		List<String> liWebEle = getOptions(dropdown, elementName);
+		int countSize = liWebEle.size();
+		for (int i = 0; i < countSize; i++) {
+			String ddText = liWebEle.get(i);
+			if (ddText.contains(partialTextToSelect)) {
+				countSize = i;
+				break;
+			}
+		}
+		selectByIndex(dropdown, countSize, elementName);
+		getExtentTest().log(Status.INFO, "Value selected in dropdown succesfully ");
+	}
+
+	/*
+	 * Waits. Playwright's own click()/fill()/etc. already wait for an element
+	 * to be visible, stable, enabled and receive events before acting, so most
+	 * explicit ExpectedConditions calls become unnecessary. waitFor() is kept
+	 * for cases where a bare visibility/attachment check is needed without an
+	 * accompanying action.
+	 */
+	public void waitforElementVisibilty(Locator element, String elementName) {
+		try {
+			element.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE)
+					.setTimeout(60000));
+			getExtentTest().log(Status.INFO, "Exiplicitly wait applyed succesfully on- " + elementName);
+		} catch (TimeoutError e) {
+			getExtentTest().log(Status.INFO, "Did'n apply Exiplicitly wait on - " + elementName);
+			throw e;
+		}
+	}
+
+	/*
+	 * Playwright's LocatorAssertions (assertThat(locator).hasText(...)) is the
+	 * idiomatic way to wait-for-text, but to stay dependency-parallel with the
+	 * original we poll here instead.
+	 */
+	public void waitforTextToBePresentinElement(Locator element, String text, String elementName) {
+		try {
+			long deadline = System.currentTimeMillis() + 60000;
+			while (System.currentTimeMillis() < deadline) {
+				if (element.innerText().contains(text)) {
+					getExtentTest().log(Status.INFO, "Exiplicitly wait applyed succesfully on- " + elementName);
+					return;
+				}
+				getPage().waitForTimeout(250);
+			}
+			throw new TimeoutError("Text '" + text + "' not present in " + elementName + " within timeout");
+		} catch (Exception e) {
+			getExtentTest().log(Status.INFO, "Did'n apply Exiplicitly wait on - " + elementName);
+			throw e;
+		}
+	}
+
+	public void waitforElementToBeClickable(Locator element, String elementName) {
+		try {
+			element.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE)
+					.setTimeout(60000));
+			getExtentTest().log(Status.INFO, "Exiplicitly wait applyed succesfully on- " + elementName);
+		} catch (TimeoutError e) {
+			getExtentTest().log(Status.INFO, "Did'n apply Exiplicitly wait on - " + elementName);
+			throw e;
+		}
+	}
+
+	public void waitforElementToBeSelected(Locator element, String elementName) {
+		try {
+			long deadline = System.currentTimeMillis() + 60000;
+			while (System.currentTimeMillis() < deadline) {
+				if (element.isChecked()) {
+					getExtentTest().log(Status.INFO, "Exiplicitly wait applyed succesfully on- " + elementName);
+					return;
+				}
+				getPage().waitForTimeout(250);
+			}
+			throw new TimeoutError(elementName + " was not selected within timeout");
+		} catch (Exception e) {
+			getExtentTest().log(Status.INFO, "Did'n apply Exiplicitly wait on - " + elementName);
+			throw e;
+		}
+	}
+
+	public void checkAllCheckBoxes(Locator elements, String elementName) {
+		try {
+			List<Locator> all = elements.all();
+			for (Locator el : all) {
+				if (!el.isChecked()) {
+					el.check();
+				}
+			}
+			getExtentTest().log(Status.INFO, "All check boxes selected successfully of : " + elementName);
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not checked check boxes of : " + elementName);
+		}
+	}
+
+	public void unCheckAllCheckBoxes(Locator elements, String elementName) {
+		try {
+			List<Locator> all = elements.all();
+			for (Locator el : all) {
+				if (el.isChecked()) {
+					el.uncheck();
+				}
+			}
+			getExtentTest().log(Status.INFO, "All check boxes unchecked successfully of : " + elementName);
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not unchecked check boxes of : " + elementName);
+		}
+	}
+
+	/*
+	 * Playwright handles native dialogs (alert/confirm/prompt) via an event
+	 * listener registered before the action that triggers them, rather than
+	 * a driver.switchTo().alert() call made after the fact. Register this
+	 * once per page (e.g. right after launchBrowser) before triggering the
+	 * dialog.
+	 */
+	public void handleAlert(String yesORno) {
+		getPage().onDialog((Dialog dialog) -> {
+			if (yesORno.contains("ok")) {
+				dialog.accept();
+				getExtentTest().log(Status.INFO, "Alert Accepted");
+			} else if (yesORno.contains("no")) {
+				dialog.dismiss();
+				getExtentTest().log(Status.INFO, "Alert Dismissed");
+			}
+		});
+	}
+
+	/*
+	 * Kept for direct parity, but Playwright's auto-waiting generally removes
+	 * the need for static sleeps - prefer waitFor()/assertThat() where possible.
+	 */
+	public void staticWait(long time) {
+		try {
+			Thread.sleep(time);
+			getExtentTest().log(Status.INFO, "Static wait applyed successfully");
+		} catch (InterruptedException e) {
+			getExtentTest().log(Status.FAIL, "Static wait Did not apply");
+			e.printStackTrace();
+		}
+	}
+
+	public void scrollDown(int scroll) {
+		try {
+			getPage().mouse().wheel(0, scroll);
+			getExtentTest().log(Status.INFO, "Scroll down action performed successfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Failed to performed Scroll down action");
+			throw e;
+		}
+	}
+
+	public void scrollUp(int scroll) {
+		try {
+			getPage().mouse().wheel(0, -scroll);
+			getExtentTest().log(Status.INFO, "Scroll up action performed successfully");
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Failed to performed Scroll up action");
+			throw e;
+		}
+	}
+
+	public void elementToBeClickeable(Locator element) {
+		element.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
+	}
+
+	public void logPass(String actaul, String expected, String elementName) {
+		getExtentTest().log(Status.PASS, "Actual Value" + " [ " + actaul + " ] " + "Matched With Expected Value " + "[ "
+				+ expected + " ]" + " Of:-" + elementName);
+	}
+
+	public void logFail(String actaul, String expected, Locator element, String elementName) {
+		getExtentTest().log(Status.FAIL, "Actual Value" + " [ " + actaul + " ] " + "Not Matched With Expected Value "
+				+ "[ " + expected + " ]" + " Of:-" + elementName);
+		addcapture(element, elementName);
+	}
+
+	public void logPass(boolean actaul, boolean expected, String elementName) {
+		getExtentTest().log(Status.PASS, "Actual Value" + " [ " + actaul + " ] " + "Matched With Expected Value " + "[ "
+				+ expected + " ]" + " Of:-" + elementName);
+	}
+
+	public void logFail(boolean actaul, boolean expected, Locator element, String elementName) {
+		getExtentTest().log(Status.FAIL, "Actual Value" + " [ " + actaul + " ] " + "Not Matched With Expected Value "
+				+ "[ " + expected + " ]" + " Of:-" + elementName);
+		addcapture(element, elementName);
+	}
+
+	public void verifyElementTagName(Locator element, String expectedTagName, String elementName) {
+		try {
+			String tagName = (String) element.evaluate("el => el.tagName.toLowerCase()");
+			if (tagName.equals(expectedTagName)) {
+				getExtentTest().log(Status.INFO,
+						tagName + " :- matched with -: " + expectedTagName + " of : " + elementName);
+			} else {
+				getExtentTest().log(Status.FAIL,
+						tagName + " :- not matched with -: " + expectedTagName + " of : " + elementName);
+				getSnapShote(element, elementName);
+			}
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Tagname not found of: " + elementName);
+			getSnapShote(element, elementName);
+			throw e;
+		}
+	}
+
+	public void verifyPasswordIsMasked(Locator element) {
+		String actValue = element.getAttribute("type");
+		if ("password".equals(actValue)) {
+			getExtentTest().log(Status.PASS, "Password is masked Of Password text box");
+		} else {
+			getExtentTest().log(Status.FAIL, "Password is not masked of Password textbox");
+		}
+	}
+
+	public void verifyFirstSelectedOption(Locator dropdown, String expectedValue, String elementName) {
+		String actText = getdropdownSelectedOption(dropdown, elementName);
+		if (actText.equals(expectedValue)) {
+			logPass(actText, expectedValue, elementName);
+		} else {
+			logFail(actText, expectedValue, dropdown, elementName);
+		}
+	}
+
+	public void verifyTitle(String expectedTitle, String elementName) {
+		try {
+			String actTitle = getPage().title();
+			if (actTitle.equals(expectedTitle)) {
+				logPass(actTitle, expectedTitle, elementName);
+			} else {
+				getExtentTest().log(Status.FAIL, "Actual Value" + " [ " + actTitle + " ] "
+						+ "Not Matched With Expected Value " + "[ " + expectedTitle + " ]" + " Of:-" + elementName);
+			}
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not find Title");
+			throw e;
+		}
+	}
+
+	public void verifyInnerText(Locator element, String expectedIT, String elementName) {
+		String strText;
+		try {
+			strText = element.innerText();
+			if (strText.equals(expectedIT)) {
+				logPass(strText, expectedIT, elementName);
+			} else {
+				logFail(strText, expectedIT, element, elementName);
+			}
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not found text of the element");
+			getSnapShote(element, elementName);
+			throw e;
+		}
+	}
+
+	public void verifyIsEnabled(Locator element, boolean expection, String elementName) {
+		try {
+			boolean actual = element.isEnabled();
+			if (actual == expection) {
+				logPass(actual, expection, elementName);
+			} else {
+				logFail(actual, expection, element, elementName);
+			}
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Did not Verify By verifyIsEnabled method");
+			addcapture(element, elementName);
+			throw e;
+		}
+	}
+
+	public void verifyDisplayed(Locator element, boolean expection, String elementName) {
+		try {
+			boolean blDisplayedStatus = element.isVisible();
+			if (blDisplayedStatus == expection) {
+				logPass(elementName, elementName, elementName);
+			} else {
+				logFail(blDisplayedStatus, expection, element, elementName);
+			}
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Unable to validate by verifyDisplayed method");
+			getSnapShote(element, elementName);
+			throw e;
+		}
+	}
+
+	public boolean verifySelected(Locator element, boolean expection, String elementName) {
+		boolean actual;
+		try {
+			actual = element.isChecked();
+			if (actual == expection) {
+				logPass(actual, expection, elementName);
+			} else {
+				logFail(actual, expection, element, elementName);
+			}
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "Unable to validate by isSelected method");
+			getSnapShote(element, elementName);
+			throw e;
+		}
+		return actual;
+	}
+
+	public void verifyAttribute(Locator element, String expectedValue, String attributeName, String elementName) {
+		try {
+			String actualValue = element.getAttribute(attributeName);
+			if (actualValue != null && actualValue.equals(expectedValue)) {
+				logPass(actualValue, expectedValue, elementName);
+			} else {
+				logFail(actualValue, expectedValue, element, elementName);
+			}
+		} catch (Exception e) {
+			getExtentTest().log(Status.FAIL, "attribute value not found of: " + elementName);
+			getSnapShote(element, elementName);
+			throw e;
+		}
+	}
+
+	// Apache POI - identical to the Selenium version, no browser dependency.
+	public static void getExcelData() {
+		try {
+			InputStream is = new FileInputStream("ExcelData\\Login.xlsx");
+			Workbook wook = new XSSFWorkbook(is);
+			Sheet sheetObj = wook.getSheet("Login");
+			int countR = sheetObj.getLastRowNum();
+			for (int i = 0; i < countR; i++) {
+				Row rowObj = sheetObj.getRow(i);
+				int countCell = rowObj.getLastCellNum();
+				for (int j = 0; j < countCell; j++) {
+					Cell cellObj = rowObj.getCell(j);
+					System.out.println(cellObj.getStringCellValue());
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+}

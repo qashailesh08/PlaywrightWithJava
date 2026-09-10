@@ -1,0 +1,31 @@
+package test;
+
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+
+public class FirstTest {
+
+	public static void main(String[] args) {
+		try (Playwright play = Playwright.create()) {
+			Browser browser = play.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+			Page page = browser.newPage();
+			page.navigate("https://www.flipkart.com/");
+
+			System.out.println(page.title());
+			
+			Locator searchBox=page.locator("(//input[@name='q'])[1]");
+			
+			searchBox.clear();
+			searchBox.fill("Shoes for men");
+			
+
+//			browser.close();
+
+		}
+
+	}
+
+}

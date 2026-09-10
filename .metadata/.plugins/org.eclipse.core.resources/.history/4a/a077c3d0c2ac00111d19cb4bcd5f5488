@@ -1,0 +1,19 @@
+package com.eva.webutil;
+
+import java.util.Date;
+
+import com.microsoft.playwright.Page;
+
+import freemarker.template.SimpleDate;
+
+public class getSnapeShots {
+	
+	
+	
+	public static void getSnape(Page page,String MethodName) {
+		
+		Date simpeDate=new SimpleDate("dd-mm-yy mm");
+		
+	}
+
+}

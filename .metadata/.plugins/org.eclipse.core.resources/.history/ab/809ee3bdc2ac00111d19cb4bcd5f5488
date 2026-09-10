@@ -1,0 +1,13 @@
+package com.eva.webutil;
+
+import com.microsoft.playwright.Page;
+
+public class getSnapeShots {
+	
+	
+	
+	public static void getSnape(Page page,String MethodName) {
+		
+	}
+
+}

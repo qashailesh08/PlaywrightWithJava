@@ -1,0 +1,13 @@
+package or;
+
+import com.microsoft.playwright.Page;
+
+class DemoBlazeLoginOr {
+	
+	protected final Page page;
+	
+	public DemoBlazeLoginOr(Page page) {
+		this.page=page;
+	}
+
+}

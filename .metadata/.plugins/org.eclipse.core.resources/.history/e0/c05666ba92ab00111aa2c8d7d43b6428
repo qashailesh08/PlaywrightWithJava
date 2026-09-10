@@ -1,0 +1,12 @@
+package com.eva.webutil;
+
+import com.aventstack.extentreports.ExtentReports;
+
+public class ReportManager {
+	private static ExtentReports exReportObj;
+	public void getInstance() {
+		
+
+	}
+
+}

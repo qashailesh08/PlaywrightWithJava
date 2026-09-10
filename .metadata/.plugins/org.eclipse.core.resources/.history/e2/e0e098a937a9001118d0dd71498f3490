@@ -1,0 +1,12 @@
+package pages;
+
+import org.testng.annotations.Test;
+
+public class VtigerCRM {
+
+	
+	@Test
+	public void test_crm() {
+		
+	}
+}

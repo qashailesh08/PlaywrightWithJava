@@ -1,0 +1,10 @@
+package com.eva.webutil;
+
+public class ReportManager {
+
+	public void getInstance() {
+		
+
+	}
+
+}

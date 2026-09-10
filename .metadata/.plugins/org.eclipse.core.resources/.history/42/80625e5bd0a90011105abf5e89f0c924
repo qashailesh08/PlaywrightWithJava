@@ -1,0 +1,18 @@
+package pages;
+
+import org.testng.annotations.Test;
+
+import base.Base;
+
+public class Run extends Base {
+
+	@Test
+	public void test_01_Login() {
+		DemoBlazeLoginPage demo = new DemoBlazeLoginPage(null);
+	}
+
+	public void test_02_Add_To_Card() {
+
+	}
+
+}

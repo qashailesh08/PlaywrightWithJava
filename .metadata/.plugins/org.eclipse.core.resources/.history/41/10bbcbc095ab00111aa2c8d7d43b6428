@@ -1,0 +1,38 @@
+package pages;
+
+import org.testng.annotations.Test;
+
+import base.BaseTest;
+
+public class DemoTest extends BaseTest {
+
+	@Test
+	public void test_001_demoBlaze() {
+
+		test.info("Launched URL");
+		page.navigate("https://demowebshop.tricentis.com/login");
+
+		test.info("Entered User Name");
+		page.locator("input[id='Email']").fill("qa.shailesh08@gmail.com");
+
+		test.info("Entered Password");
+		page.locator("input[id='Password']").fill("shailesh08");
+
+		test.info("Clicked On Log In Button");
+		page.locator("input[value='Log in']").click();
+
+	}
+
+	@Test
+	public void test_002_demoBlaze_skipped() {
+
+		test.skip("Skipped This Test");
+
+	}
+
+	@Test
+	public void test_003_demoBlaze_Failed() {
+
+		
+	}
+}

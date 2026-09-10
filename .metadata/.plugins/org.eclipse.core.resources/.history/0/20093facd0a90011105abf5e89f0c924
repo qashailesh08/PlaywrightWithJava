@@ -1,0 +1,16 @@
+package pages;
+
+import org.testng.annotations.Test;
+
+import base.Base;
+
+public class Run extends Base {
+
+	@Test
+	public void test_01_Login() {
+		DemoBlazeLoginPage demo = new DemoBlazeLoginPage(page);
+		demo.verifyLoginPageTitle("Demo Web Shop");
+		demo.login("qa.shailesh08@gmail.com", "shailesh08");
+	}
+
+}

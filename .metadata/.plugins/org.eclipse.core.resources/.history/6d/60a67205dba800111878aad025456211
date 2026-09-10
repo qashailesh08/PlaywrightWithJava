@@ -1,0 +1,21 @@
+package com.eva.tests;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import base.BaseTest;
+import com.eva.pages.LoginPage;
+
+public class LoginTest extends BaseTest {
+
+	@Test
+	public void invalidLoginShowsErrorMessage() {
+		webUtil.openUrl("https://example.com/login");
+
+		LoginPage loginPage = new LoginPage(page);
+		loginPage.login("invalidUser", "wrongPassword");
+
+		String actualError = loginPage.getErrorMessage();
+		Assert.assertEquals(actualError, "Invalid username or password");
+	}
+}

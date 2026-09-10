@@ -1,0 +1,25 @@
+package com.practice;
+
+public class SecondLarginArr {
+
+	public static void main(String[] args) {
+		check_first_large();
+	}
+
+	public static void check_first_large() {
+		int[] num = { 12, 5, 232, 46, 2 };
+
+		int large = num[0];
+		for (int i = 1; i < num.length; i++) {
+			if (num[i] > large) {
+				large = num[i];
+
+			}
+
+			
+
+		}
+		System.out.println("First Large Number in Array is: " + large);
+	}
+
+}

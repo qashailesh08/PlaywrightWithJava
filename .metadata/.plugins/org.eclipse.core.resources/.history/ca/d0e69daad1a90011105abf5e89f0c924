@@ -1,0 +1,61 @@
+package base;
+
+import java.lang.reflect.Method;
+
+import org.testng.ITestResult;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Parameters;
+
+import com.aventstack.extentreports.Status;
+import com.eva.webutil.WebUtil;
+import com.microsoft.playwright.Page;
+
+public class Base {
+	protected WebUtil webUtil;
+	protected Page page;
+
+	@BeforeSuite(alwaysRun = true)
+	public void beforeSuite() {
+		WebUtil.generateReport();
+	}
+
+	@BeforeMethod(alwaysRun = true)
+//	@Parameters({ "browser" })
+	public void setUp(Method method) {
+		webUtil = WebUtil.getInstance();
+		webUtil.createReport(method.getName());
+		webUtil.launchBrowser("browser");
+		page = webUtil.getPage();
+	}
+
+	/*
+	 * On failure, capture a full-page screenshot and attach it to the ExtentReports
+	 * node before tearing the browser down - equivalent to the addcapture() calls
+	 * scattered through the Selenium version's catch blocks, centralised here so
+	 * every @Test gets it for free.
+	 */
+	@AfterMethod(alwaysRun = true)
+	public void tearDown(ITestResult result) {
+		try {
+			if (result.getStatus() == ITestResult.FAILURE) {
+				String screenshotPath = webUtil.getSnapShote(result.getMethod().getMethodName());
+				webUtil.getExtentTest().log(Status.FAIL, "Test Failed: " + result.getThrowable());
+				webUtil.getExtentTest().addScreenCaptureFromPath(screenshotPath);
+			} else if (result.getStatus() == ITestResult.SUCCESS) {
+				webUtil.getExtentTest().log(Status.PASS, "Test Passed");
+			} else if (result.getStatus() == ITestResult.SKIP) {
+				webUtil.getExtentTest().log(Status.SKIP, "Test Skipped: " + result.getThrowable());
+			}
+		} finally {
+			webUtil.quit(0);
+		}
+	}
+
+	@AfterSuite(alwaysRun = true)
+	public void afterSuite() {
+		webUtil.flushReport();
+	}
+}

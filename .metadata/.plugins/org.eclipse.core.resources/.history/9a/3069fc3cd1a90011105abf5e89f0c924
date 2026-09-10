@@ -1,0 +1,26 @@
+package pages;
+
+import org.testng.annotations.Test;
+
+import base.Base;
+
+public class Run extends Base {
+
+	@Test(priority = 1, groups = { "@Smoke" })
+	public void test_01_Login() {
+		webUtil.openUrl("https://demowebshop.tricentis.com/login");
+		DemoBlazeLoginPage demo = new DemoBlazeLoginPage(page);
+		demo.verifyLoginPageTitle("Demo Web Shop");
+		demo.login("qa.shailesh08@gmail.com", "shailesh08");
+	}
+
+	@Test(priority = 2, groups = { "@Smoke" })
+	public void test_02() {
+		webUtil.openUrl("https://demowebshop.tricentis.com/login");
+		DemoBlazeLoginPage demo = new DemoBlazeLoginPage(page);
+		AddToCard add = new AddToCard(page);
+		demo.verifyLoginPageTitle("Demo Web Shop");
+		demo.login("qa.shailesh08@gmail.com", "shailesh08");
+		add.removeFromAddToCard();
+	}
+}

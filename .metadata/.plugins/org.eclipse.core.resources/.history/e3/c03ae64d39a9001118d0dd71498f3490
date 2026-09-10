@@ -1,0 +1,35 @@
+package pages;
+
+import org.testng.annotations.Test;
+
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.options.AriaRole;
+
+public class VtigerCRM {
+
+	
+	@Test
+	public void test_crm() {
+		
+		Playwright playwright=Playwright.create();
+		
+		Browser browser=playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(1000));
+		
+		Page page=browser.newPage();
+		
+		page.navigate("https://www.vtiger.com/open-source-crm/");
+		
+		page.getByRole(AriaRole.BUTTON,new Page.GetByRoleOptions().setName(" Login")).click();
+		
+		page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("username")).fill("engineershailesh226@gmail.com");
+		
+		
+
+		// Vtiger CRM
+		// engineershailesh226@gmail.com
+		// @Shailesh08
+	}
+}

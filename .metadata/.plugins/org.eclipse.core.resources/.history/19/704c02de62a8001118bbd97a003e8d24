@@ -1,0 +1,21 @@
+package pages;
+
+import org.testng.annotations.Test;
+
+import base.BaseTest;
+
+public class DemoTest extends BaseTest{
+
+	
+	
+	
+	@Test
+	public void test_001_demoBlaze() {
+		page.navigate("https://demowebshop.tricentis.com/login");
+		
+		page.locator("input[id='Email']").fill("qa.shailesh08@gmail.com");
+		
+		page.locator("input[id='Password']")
+		
+	}
+}

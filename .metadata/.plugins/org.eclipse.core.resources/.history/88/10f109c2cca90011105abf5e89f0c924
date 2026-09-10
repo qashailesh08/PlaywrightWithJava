@@ -1,0 +1,44 @@
+package pages;
+
+import com.eva.webutil.WebUtil;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+
+public class DemoBlazeLoginPage {
+
+	protected Page page;
+	protected Locator loginbutton1;
+	protected Locator userEmail;
+	protected Locator userPassword;
+	protected Locator rememberMe;
+	protected Locator login;
+	protected Locator errorMessage;
+	protected WebUtil util;
+
+	public DemoBlazeLoginPage(Page page) {
+		this.page = page;
+		this.util = WebUtil.getInstance();
+		this.loginbutton1 = page.locator("//a[text()='Log in']");
+		this.userEmail = page.locator("#Email");
+		this.userPassword = page.locator("#Password");
+		this.rememberMe = page.locator("#RememberMe");
+		this.login = page.locator("input[value='Log in']");
+		this.errorMessage = page.locator("//div[@class='validation-summary-errors']/span");
+
+	}
+
+	public void login(String userEmail, String password) {
+
+		this.util.click(loginbutton1, "Log in Button 1");
+		this.util.inputValue(this.userEmail, userEmail, "User Email");
+		this.util.inputValue(userPassword, password, "User Password");
+		this.util.click(rememberMe, "Remember Me CB");
+		this.util.click(login, "Login Button");
+
+	}
+
+	public void verifyLoginErrorMessage(String expectedError) {
+		this.util.verifyInnerText(errorMessage, expectedError, "Login Error Message");
+	}
+
+}

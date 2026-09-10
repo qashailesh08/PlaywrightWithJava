@@ -1,0 +1,13 @@
+package com.practice;
+
+public class SecondLarginArr {
+
+	public static void main(String[] args) {
+
+	}
+
+	public void check_first_large() {
+		int[] num = { 12, 5, 232, 46, 2 };
+	}
+
+}

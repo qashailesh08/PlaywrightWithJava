@@ -1,0 +1,28 @@
+package pages;
+
+import com.eva.webutil.WebUtil;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+
+public class AddToCard {
+	protected Page page;
+	protected WebUtil util;
+	protected Locator shoppingCard;
+
+	public AddToCard(Page page) {
+		Page = this.page;
+		util = WebUtil.getInstance();
+		this.shoppingCard = page.locator("//span[text()='Shopping cart']");
+
+	}
+
+	public void removeFromAddToCard() {
+		this.util.click(shoppingCard, "Shopping Card");
+
+	}
+
+	public void addProductToCard() {
+
+	}
+
+}

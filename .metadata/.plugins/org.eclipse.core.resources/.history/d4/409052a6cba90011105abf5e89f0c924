@@ -1,0 +1,30 @@
+package pages;
+
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+
+public class DemoBlazeLoginPage {
+
+	protected Page page;
+
+	protected Locator loginbutton1;
+	protected Locator userEmail;
+	protected Locator userPassword;
+	protected Locator rememberMe;
+	protected Locator login;
+
+	public DemoBlazeLoginPage(Page page) {
+		this.page = page;
+		this.loginbutton1 = page.locator("//a[text()='Log in']");
+		this.userEmail = page.locator("#Email");
+		this.userPassword = page.locator("#Password");
+		this.rememberMe = page.locator("#RememberMe");
+		this.login = page.locator("input[value='Log in']");
+
+	}
+
+	public void login(String userEmail, String password) {
+
+	}
+
+}

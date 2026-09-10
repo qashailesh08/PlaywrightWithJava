@@ -1,0 +1,47 @@
+package pages;
+
+import com.eva.webutil.WebUtil;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+
+public class AddToCard {
+	protected final Page page;
+	protected final WebUtil util;
+	protected final Locator shoppingCard;
+	protected final Locator selectProduct;
+	protected final Locator updateShoppingCard;
+	protected final Locator EmptyAddToCard;
+	// Add Product To Card
+	protected final Locator searchProduct;
+	protected final Locator searchButton;
+	protected final Locator selProduct;
+
+	public AddToCard(Page page) {
+		this.page = page;
+		util = WebUtil.getInstance();
+		this.shoppingCard = page.locator("//span[text()='Shopping cart']"); // click on shopping card button
+		this.selectProduct = page.locator("//input[@name='updatecart']"); // select the product
+		this.updateShoppingCard = page.locator("//input[@name='removefromcart']"); // remove from add to card history
+		this.EmptyAddToCard = page.locator("//div[@class='order-summary-content']"); // check empty add to card
+		this.searchProduct = page.locator("//input[@id='small-searchterms']"); // Enter Product Name to Search Text box
+		this.searchButton = page.locator("//input[@value='Search']"); // Click on Search Button
+		this.selProduct = page.locator("(//a[contains(@href,'laptop')])[1]"); // Searched Product Name
+
+	}
+
+	public void removeFromAddToCard() {
+		this.util.click(shoppingCard, "Shopping Card");
+		this.util.click(selectProduct, "Product Selected");
+		this.util.click(updateShoppingCard, "Remove Product");
+		this.util.verifyInnerText(EmptyAddToCard, "Your Shopping Cart is empty!", "Empy Add To Card History");
+
+	}
+
+	public void addProductToCard(String productName) {
+
+		this.util.inputValue(searchProduct, productName, "Search Box");
+		
+		
+	}
+
+}

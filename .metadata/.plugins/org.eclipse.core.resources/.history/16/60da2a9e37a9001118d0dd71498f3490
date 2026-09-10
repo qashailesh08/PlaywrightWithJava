@@ -1,0 +1,9 @@
+package pages;
+
+public class VtigerCRM {
+
+	
+	public void test_crm() {
+		
+	}
+}

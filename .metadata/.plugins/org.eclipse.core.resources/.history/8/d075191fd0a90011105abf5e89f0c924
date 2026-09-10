@@ -1,0 +1,12 @@
+package pages;
+
+import org.testng.annotations.Test;
+
+public class Run {
+	
+	@Test
+	public void test_01_Login() {
+		new DemoBlazeLoginPage(null);
+	}
+
+}

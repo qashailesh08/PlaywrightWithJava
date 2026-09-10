@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="java.lang.Class">
+		<item key="replaceBarOpen" value="true"/>
+		<list key="findhistory">
+			<item value=", enabled = false"/>
+			<item value=".setSlowMo(1000)"/>
+		</list>
+		<list key="replacehistory">
+		</list>
+	</section>
+</section>
