@@ -1,31 +1,214 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testng-results ignored="0" total="2" passed="2" failed="0" skipped="0">
+<testng-results ignored="2" total="9" passed="7" failed="0" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2026-09-05T08:44:02 IST" name="Surefire suite" finished-at="2026-09-05T08:44:28 IST" duration-ms="25497">
+  <suite started-at="2026-09-11T07:43:06 IST" name="Surefire suite" finished-at="2026-09-11T07:43:55 IST" duration-ms="49349">
     <groups>
+      <group name="@Smoke">
+        <method signature="RunTest.test_01_Login()[pri:1, instance:test.RunTest@2145433b]" name="test_01_Login" class="test.RunTest"/>
+      </group> <!-- @Smoke -->
     </groups>
-    <test started-at="2026-09-05T08:44:02 IST" name="Surefire test" finished-at="2026-09-05T08:44:28 IST" duration-ms="25497">
-      <class name="test.FirstTest">
-        <test-method is-config="true" signature="setUp()[pri:0, instance:test.FirstTest@2b4a2ec7]" started-at="2026-09-05T08:44:21 IST" name="setUp" finished-at="2026-09-05T08:44:22 IST" duration-ms="1929" status="PASS">
+    <test started-at="2026-09-11T07:43:06 IST" name="Surefire test" finished-at="2026-09-11T07:43:55 IST" duration-ms="49349">
+      <class name="test.LoginTest">
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:test.LoginTest@341b80b2]" started-at="2026-09-11T07:43:34 IST" name="setUp" finished-at="2026-09-11T07:43:35 IST" duration-ms="1245" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void test.LoginTest.invalidLoginShowsErrorMessage()]]>
+              </value>
+            </param>
+          </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="main()[pri:0, instance:test.FirstTest@2b4a2ec7]" started-at="2026-09-05T08:44:22 IST" name="main" finished-at="2026-09-05T08:44:28 IST" duration-ms="5104" status="PASS">
+        <test-method signature="invalidLoginShowsErrorMessage()[pri:0, instance:test.LoginTest@341b80b2]" started-at="2026-09-11T07:43:35 IST" name="invalidLoginShowsErrorMessage" finished-at="2026-09-11T07:43:39 IST" duration-ms="4083" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- invalidLoginShowsErrorMessage -->
+        <test-method is-config="true" signature="tearDown(org.testng.ITestResult)[pri:0, instance:test.LoginTest@341b80b2]" started-at="2026-09-11T07:43:39 IST" name="tearDown" finished-at="2026-09-11T07:43:40 IST" duration-ms="386" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=invalidLoginShowsErrorMessage status=SUCCESS method=LoginTest.invalidLoginShowsErrorMessage()[pri:0, instance:test.LoginTest@341b80b2] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- test.LoginTest -->
+      <class name="test.FirstTest">
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:test.FirstTest@8e0379d]" started-at="2026-09-11T07:43:30 IST" name="setUp" finished-at="2026-09-11T07:43:31 IST" duration-ms="1116" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void test.FirstTest.main()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="main()[pri:0, instance:test.FirstTest@8e0379d]" started-at="2026-09-11T07:43:31 IST" name="main" finished-at="2026-09-11T07:43:34 IST" duration-ms="2866" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- main -->
+        <test-method is-config="true" signature="tearDown(org.testng.ITestResult)[pri:0, instance:test.FirstTest@8e0379d]" started-at="2026-09-11T07:43:34 IST" name="tearDown" finished-at="2026-09-11T07:43:34 IST" duration-ms="456" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=main status=SUCCESS method=FirstTest.main()[pri:0, instance:test.FirstTest@8e0379d] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
       </class> <!-- test.FirstTest -->
-      <class name="pages.DemoTest">
-        <test-method is-config="true" signature="setUp()[pri:0, instance:pages.DemoTest@51931956]" started-at="2026-09-05T08:44:02 IST" name="setUp" finished-at="2026-09-05T08:44:12 IST" duration-ms="9513" status="PASS">
+      <class name="test.RunTest">
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:test.RunTest@2145433b]" started-at="2026-09-11T07:43:47 IST" name="setUp" finished-at="2026-09-11T07:43:49 IST" duration-ms="1163" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void test.RunTest.test_01_Login()]]>
+              </value>
+            </param>
+          </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="test_001_demoBlaze()[pri:0, instance:pages.DemoTest@51931956]" started-at="2026-09-05T08:44:12 IST" name="test_001_demoBlaze" finished-at="2026-09-05T08:44:21 IST" duration-ms="8874" status="PASS">
+        <test-method signature="test_01_Login()[pri:1, instance:test.RunTest@2145433b]" started-at="2026-09-11T07:43:49 IST" name="test_01_Login" finished-at="2026-09-11T07:43:54 IST" duration-ms="5908" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- test_01_Login -->
+        <test-method is-config="true" signature="tearDown(org.testng.ITestResult)[pri:0, instance:test.RunTest@2145433b]" started-at="2026-09-11T07:43:54 IST" name="tearDown" finished-at="2026-09-11T07:43:55 IST" duration-ms="407" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=test_01_Login status=SUCCESS method=RunTest.test_01_Login()[pri:1, instance:test.RunTest@2145433b] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- test.RunTest -->
+      <class name="test.RecordingTest">
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:test.RecordingTest@55a1c291]" started-at="2026-09-11T07:43:40 IST" name="setUp" finished-at="2026-09-11T07:43:41 IST" duration-ms="1124" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[void test.RecordingTest.test()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="test()[pri:0, instance:test.RecordingTest@55a1c291]" started-at="2026-09-11T07:43:41 IST" name="test" finished-at="2026-09-11T07:43:47 IST" duration-ms="6113" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- test -->
+        <test-method is-config="true" signature="tearDown(org.testng.ITestResult)[pri:0, instance:test.RecordingTest@55a1c291]" started-at="2026-09-11T07:43:47 IST" name="tearDown" finished-at="2026-09-11T07:43:47 IST" duration-ms="390" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=test status=SUCCESS method=RecordingTest.test()[pri:0, instance:test.RecordingTest@55a1c291] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- test.RecordingTest -->
+      <class name="test.DemoTest">
+        <test-method is-config="true" signature="beforeSuite()[pri:0, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:05 IST" name="beforeSuite" finished-at="2026-09-11T07:43:06 IST" duration-ms="227" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- beforeSuite -->
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:06 IST" name="setUp" finished-at="2026-09-11T07:43:10 IST" duration-ms="4325" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void test.DemoTest.test_001_demoBlaze()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="test_001_demoBlaze()[pri:1, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:10 IST" name="test_001_demoBlaze" finished-at="2026-09-11T07:43:15 IST" duration-ms="5606" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- test_001_demoBlaze -->
-      </class> <!-- pages.DemoTest -->
+        <test-method is-config="true" signature="tearDown(org.testng.ITestResult)[pri:0, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:15 IST" name="tearDown" finished-at="2026-09-11T07:43:16 IST" duration-ms="448" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=test_001_demoBlaze status=SUCCESS method=DemoTest.test_001_demoBlaze()[pri:1, instance:test.DemoTest@35083305] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:16 IST" name="setUp" finished-at="2026-09-11T07:43:17 IST" duration-ms="1135" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void test.DemoTest.test_002_demoBlaze_skipped()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="test_002_demoBlaze_skipped()[pri:2, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:17 IST" name="test_002_demoBlaze_skipped" finished-at="2026-09-11T07:43:23 IST" duration-ms="5522" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- test_002_demoBlaze_skipped -->
+        <test-method is-config="true" signature="tearDown(org.testng.ITestResult)[pri:0, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:23 IST" name="tearDown" finished-at="2026-09-11T07:43:23 IST" duration-ms="390" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=test_002_demoBlaze_skipped status=SUCCESS method=DemoTest.test_002_demoBlaze_skipped()[pri:2, instance:test.DemoTest@35083305] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:23 IST" name="setUp" finished-at="2026-09-11T07:43:24 IST" duration-ms="1133" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void test.DemoTest.test_003_demoBlaze_Failed()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="test_003_demoBlaze_Failed()[pri:3, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:24 IST" name="test_003_demoBlaze_Failed" finished-at="2026-09-11T07:43:29 IST" duration-ms="5045" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- test_003_demoBlaze_Failed -->
+        <test-method is-config="true" signature="tearDown(org.testng.ITestResult)[pri:0, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:29 IST" name="tearDown" finished-at="2026-09-11T07:43:30 IST" duration-ms="413" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=test_003_demoBlaze_Failed status=SUCCESS method=DemoTest.test_003_demoBlaze_Failed()[pri:3, instance:test.DemoTest@35083305] output={null}]]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+        <test-method is-config="true" signature="afterSuite()[pri:0, instance:test.DemoTest@35083305]" started-at="2026-09-11T07:43:55 IST" name="afterSuite" finished-at="2026-09-11T07:43:55 IST" duration-ms="11" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- afterSuite -->
+      </class> <!-- test.DemoTest -->
     </test> <!-- Surefire test -->
   </suite> <!-- Surefire suite -->
 </testng-results>

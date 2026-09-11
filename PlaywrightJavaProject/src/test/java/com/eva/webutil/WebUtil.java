@@ -146,19 +146,17 @@ public class WebUtil {
 			switch (browserName) {
 			case "chromebrowser":
 				browser = playwright.chromium()
-						.launch(new BrowserType.LaunchOptions().setHeadless(false));
+						.launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(250));
 				break;
 			case "firebrowser":
 				browser = playwright.firefox()
-						.launch(new BrowserType.LaunchOptions().setHeadless(false));
+						.launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(250));
 				break;
 			case "edgebrowser":
-				browser = playwright.chromium().launch(
-						new BrowserType.LaunchOptions().setHeadless(false).setChannel("msedge"));
+				browser = playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(250));
 				break;
 			case "safaribrowser":
-				browser = playwright.webkit()
-						.launch(new BrowserType.LaunchOptions().setHeadless(false));
+				browser = playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(250));
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown browser: " + browserName);
@@ -495,21 +493,66 @@ public class WebUtil {
 	 * directly. This method returns the Page whose title matches, closest
 	 * equivalent of the original handle-hunting loop.
 	 */
-	public Page switchToWindowByTitle(String expectedWinTitle) {
+	/*
+	 * public Page switchToWindowByTitle(String expectedWinTitle) { try { for (Page
+	 * p : getContext().pages()) { if (p.title().equals(expectedWinTitle)) {
+	 * getExtentTest().log(Status.PASS, " [ " + p.title() + " ] matched with [ " +
+	 * expectedWinTitle + " ]"); poolPage.set(p); return p; } } } catch (Exception
+	 * e) { getExtentTest().log(Status.FAIL, "Did not find windowes"); throw e; }
+	 * return null; }
+	 */
+
+	/*
+	 * public Page switchToWindowByTitle(String expectedWinTitle) {
+	 * 
+	 * try { for (Page p : getContext().pages()) {
+	 * 
+	 * if (p.title().equals(expectedWinTitle)) {
+	 * 
+	 * getExtentTest().log(Status.PASS, "[" + p.title() + "] matched with [" +
+	 * expectedWinTitle + "]");
+	 * 
+	 * poolPage.set(p);
+	 * 
+	 * return p; } }
+	 * 
+	 * throw new RuntimeException("Window with title [" + expectedWinTitle +
+	 * "] not found");
+	 * 
+	 * } catch (Exception e) {
+	 * 
+	 * getExtentTest().log(Status.FAIL, "Did not find window with title: " +
+	 * expectedWinTitle);
+	 * 
+	 * throw e; } }
+	 */
+	public Page switchToNewWindowByTitle(String expectedTitle, Locator locator) {
+
 		try {
-			for (Page p : getContext().pages()) {
-				if (p.title().equals(expectedWinTitle)) {
-					getExtentTest().log(Status.PASS,
-							" [ " + p.title() + " ] matched with [ " + expectedWinTitle + " ]");
-					poolPage.set(p);
-					return p;
-				}
+
+			Page newPage = getPage().waitForPopup(() -> {
+				click(locator, "New Tab");
+			});
+
+			newPage.waitForLoadState();
+
+			if (newPage.title().equals(expectedTitle)) {
+
+				getExtentTest().log(Status.PASS, "[" + newPage.title() + "] matched with [" + expectedTitle + "]");
+
+				poolPage.set(newPage);
+
+				return newPage;
 			}
+
+			throw new RuntimeException("Expected title [" + expectedTitle + "] but found [" + newPage.title() + "]");
+
 		} catch (Exception e) {
-			getExtentTest().log(Status.FAIL, "Did not find windowes");
+
+			getExtentTest().log(Status.FAIL, "New window not found: " + expectedTitle);
+
 			throw e;
 		}
-		return null;
 	}
 
 	public void fullScreen() {

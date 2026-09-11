@@ -1,0 +1,20 @@
+package test;
+
+import base.Base;
+import pages.HandleWindow;
+
+public class WindowHandleTest extends Base {
+
+//	@Test(priority = 1)
+	public void test_01_new_window() {
+		webUtil.openUrl("https://testautomationpractice.blogspot.com/");
+		HandleWindow hd = new HandleWindow(page);
+		hd.verifyHomePageTitle();
+		hd.handleNewWindow();
+		hd.SearchBox("Playwright");
+		hd.verify2WinTitle();
+		webUtil.flushReport();
+
+	}
+
+}

@@ -1,0 +1,62 @@
+package base;
+
+import java.lang.reflect.Method;
+
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.eva.webutil.ReportManager;
+import com.eva.webutil.WebUtil;
+import com.eva.webutil.GetSnapeShots;
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+
+public class BaseTest {
+
+	protected Playwright playwright;
+	protected Browser browser;
+	protected Page page;
+	protected ExtentReports ext;
+	protected ExtentTest test;
+
+	@BeforeMethod
+	public void setUp(Method method) {
+		ext = ReportManager.getInstance();
+		test = ext.createTest(method.getName());
+		playwright = Playwright.create();
+		browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(1000));
+		page = browser.newPage();
+
+	}
+
+	@AfterMethod
+	public void tear_down(ITestResult report) {
+
+		if (report.getStatus() == ITestResult.FAILURE) {
+			System.out.println("Test Failed");
+			String snapPath = GetSnapeShots.getSnape(page, report.getName());
+			String projectPath = System.getProperty("user.dir");
+			String fullPath = projectPath + "/" + snapPath;
+			test.addScreenCaptureFromPath(fullPath + "shotes");
+			test.addScreenCaptureFromPath(fullPath, "Shotes");
+		} else if (report.getStatus() == ITestResult.SUCCESS) {
+			System.out.println("Test Passed");
+		} else {
+			System.out.println("Test Skipped");
+		}
+		ext.flush();
+
+		if (browser != null)
+			browser.close();
+		if (playwright != null)
+			playwright.close();
+
+	}
+
+}

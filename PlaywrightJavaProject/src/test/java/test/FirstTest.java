@@ -2,9 +2,9 @@ package test;
 
 import org.testng.annotations.Test;
 
-import base.BaseTest;
+import base.Base;
 
-public class FirstTest extends BaseTest {
+public class FirstTest extends Base {
 
 	@Test(enabled = true)
 	public void main() {
@@ -14,6 +14,9 @@ public class FirstTest extends BaseTest {
 		System.out.println(page.title());
 
 		page.locator("//span[@class='b3wTlE']").click();
+		
+		webUtil.flushReport();
+		
 		/*
 		 * Locator searchBox = page.locator("(//input[@name='q'])[1]");
 		 * 

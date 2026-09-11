@@ -1,0 +1,52 @@
+package pages;
+
+import com.eva.webutil.WebUtil;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+
+public class HandleWindow {
+
+	protected Page page;
+	protected WebUtil util;
+	protected final Locator newWin;
+	protected final Locator searchBox;
+	protected final Locator searchButton;
+
+	public HandleWindow(Page page) {
+		this.page = page;
+		this.util = WebUtil.getInstance();
+		this.page = page;
+		this.newWin = page.locator("//button[text()='New Tab']");
+		this.searchBox = page.locator("input[name='q']");
+		this.searchButton = page.locator("//input[@value='Search']");
+	}
+
+	public void verifyHomePageTitle() {
+		this.util.verifyTitle("Automation Testing Practice", "Home Page Title");
+		System.out.println("Parent Page Title " + this.page.title());
+	}
+
+	public void verify2WinTitle() {
+		this.util.verifyTitle("SDET-QA Blog", "Seconnd Title");
+	}
+
+	public void handleNewWindow() {
+
+		Page childPage = page.waitForPopup(() -> {
+			newWin.click();
+		});
+
+		childPage.waitForLoadState();
+
+		System.out.println("Child Page Title: " + childPage.title());
+
+		if (childPage.title().equals("SDET-QA Blog")) {
+			System.out.println("Child window matched");
+		}
+	}
+
+	public void SearchBox(String searchItem) {
+		this.util.inputValue(newWin, searchItem, "Search Box");
+		this.util.click(searchButton, "Search Button");
+	}
+}

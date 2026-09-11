@@ -236,3 +236,62 @@
 2026-09-10 05:40:00.404: [INFO] BookmarksLoadDropped droppedNodes=0
 2026-09-10 05:40:00.404: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
 2026-09-10 05:49:05.594: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 06:10:50.393: [INFO] CurrentProfilePath: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 06:10:50.393: [INFO] Profiles total count: 1
+2026-09-10 06:10:50.393: [INFO] Profile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T05:49:05.226Z
+2026-09-10 06:10:50.393: [INFO] LastUsedProfileDir: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 06:10:50.393: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T05:49:05.226Z
+2026-09-10 06:10:50.393: [INFO] OnDoneLoading sync enabled: 0
+2026-09-10 06:10:50.393: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-10 06:10:50.393: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-10 06:10:50.393: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 06:27:00.370: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 06:37:43.241: [INFO] CurrentProfilePath: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 06:37:43.242: [INFO] Profiles total count: 1
+2026-09-10 06:37:43.242: [INFO] Profile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T06:24:10.574Z
+2026-09-10 06:37:43.242: [INFO] LastUsedProfileDir: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 06:37:43.242: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T06:24:10.574Z
+2026-09-10 06:37:43.242: [INFO] OnDoneLoading sync enabled: 0
+2026-09-10 06:37:43.242: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-10 06:37:43.242: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-10 06:37:43.242: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 06:38:58.028: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 06:39:55.370: [INFO] CurrentProfilePath: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 06:39:55.370: [INFO] Profiles total count: 1
+2026-09-10 06:39:55.370: [INFO] Profile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T06:38:57.621Z
+2026-09-10 06:39:55.370: [INFO] LastUsedProfileDir: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 06:39:55.370: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T06:38:57.621Z
+2026-09-10 06:39:55.370: [INFO] OnDoneLoading sync enabled: 0
+2026-09-10 06:39:55.370: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-10 06:39:55.370: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-10 06:39:55.370: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 06:40:02.902: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 06:43:30.090: [INFO] CurrentProfilePath: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 06:43:30.090: [INFO] Profiles total count: 1
+2026-09-10 06:43:30.090: [INFO] Profile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T06:38:57.621Z
+2026-09-10 06:43:30.090: [INFO] LastUsedProfileDir: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 06:43:30.090: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T06:38:57.621Z
+2026-09-10 06:43:30.090: [INFO] OnDoneLoading sync enabled: 0
+2026-09-10 06:43:30.090: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-10 06:43:30.090: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-10 06:43:30.090: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 07:02:53.041: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 12:45:42.244: [INFO] CurrentProfilePath: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 12:45:42.244: [INFO] Profiles total count: 1
+2026-09-10 12:45:42.244: [INFO] Profile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T06:38:57.621Z
+2026-09-10 12:45:42.244: [INFO] LastUsedProfileDir: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-10 12:45:42.244: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T06:38:57.621Z
+2026-09-10 12:45:42.244: [INFO] OnDoneLoading sync enabled: 0
+2026-09-10 12:45:42.244: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-10 12:45:42.244: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-10 12:45:42.244: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-10 14:26:26.695: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-11 01:37:48.955: [INFO] CurrentProfilePath: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-11 01:37:48.955: [INFO] Profiles total count: 1
+2026-09-11 01:37:48.955: [INFO] Profile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T14:04:53.500Z
+2026-09-11 01:37:48.955: [INFO] LastUsedProfileDir: D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-09-11 01:37:48.955: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=D:\PlaywrightJava\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-09-10T14:04:53.500Z
+2026-09-11 01:37:48.955: [INFO] OnDoneLoading sync enabled: 0
+2026-09-11 01:37:48.955: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-11 01:37:48.955: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-11 01:37:48.955: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1

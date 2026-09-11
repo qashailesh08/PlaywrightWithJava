@@ -1,0 +1,20 @@
+package pages;
+
+import com.eva.webutil.WebUtil;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+
+public class HandleWindow {
+	
+	protected Page page;
+	protected WebUtil util;
+	protected final Locator newWin;
+	public HandleWindow(Page page) {
+		this.page=page;
+		this.newWin=page.locator("//button[text()='New Tab']");
+	}
+	
+	public void handleNewWindow() {
+		this.util.switchToWindowByTitle("SDET-QA Blog: ISTQB");
+	}
+}

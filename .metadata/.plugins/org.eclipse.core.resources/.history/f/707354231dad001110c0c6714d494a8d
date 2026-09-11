@@ -1,0 +1,14 @@
+package test;
+
+import org.testng.annotations.Test;
+
+import base.Base;
+
+public class WindowHandleRun extends Base{
+	
+	@Test(priority=1)
+	public void test_01_new_window() {
+		
+	}
+
+}

@@ -1,0 +1,10 @@
+package com.practice;
+
+import com.microsoft.playwright.Playwright;
+
+public class WinHandle {
+	public static void main(String[] args) {
+		Playwright pl=Playwright.create();
+	}
+
+}

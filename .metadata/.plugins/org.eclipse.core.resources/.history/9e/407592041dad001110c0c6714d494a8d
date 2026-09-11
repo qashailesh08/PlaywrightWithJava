@@ -1,0 +1,11 @@
+package test;
+
+import base.Base;
+
+public class WindowHandleRun extends Base{
+	
+	public void test_01_new_window() {
+		
+	}
+
+}

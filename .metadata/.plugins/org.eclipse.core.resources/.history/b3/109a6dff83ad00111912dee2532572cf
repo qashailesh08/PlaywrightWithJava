@@ -1,0 +1,66 @@
+package pages;
+
+import static org.testng.Assert.assertEquals;
+
+import org.testng.annotations.Test;
+
+import base.BaseTest;
+
+public class DemoTest extends BaseTest {
+
+	@Test(priority = 1)
+	public void test_001_demoBlaze() {
+
+		test.info("Launched URL");
+		page.navigate("https://demowebshop.tricentis.com/login");
+
+		test.info("Entered User Name");
+		page.locator("input[id='Email']").fill("qa.shailesh08@gmail.com");
+
+		test.info("Entered Password");
+		page.locator("input[id='Password']").fill("shailesh08");
+
+		test.info("Clicked On Log In Button");
+		page.locator("input[value='Log in']").click();
+		
+		test.info("Verify Home Page Title");
+		assertEquals(page.title(), "Demo Web Shop");
+
+	}
+
+	@Test(priority = 2, enabled=true)
+	public void test_002_demoBlaze_skipped() {
+
+//		test.skip("Skipped This Test");
+		page.navigate("https://demowebshop.tricentis.com/login");
+		
+		test.info("Verify Login Page Title");
+		assertEquals(page.title(), "Demo Web Shop. Login");
+		
+		test.info("Entered User Name");
+		page.locator("input[id='Email']").fill("qa.shailesh08@gmail.com");
+
+		test.info("Entered Password");
+		page.locator("input[id='Password']").fill("shailesh08");
+
+		test.info("Clicked On Log In Button");
+		page.locator("input[value='Log in']").click();
+
+	}
+
+	@Test(priority = 3, enabled=true)
+	public void test_003_demoBlaze_Failed() {
+		test.fail("Test Failed");
+		page.navigate("https://demowebshop.tricentis.com/login");
+
+		test.info("Entered User Name");
+		page.locator("input[id='Email']").fill("qa.shailesh08@gmail.com");
+
+		test.info("Entered Password");
+		page.locator("input[id='Password']").fill("shailesh08");
+
+		test.info("Clicked On Log In Button");
+		page.locator("input[value='Log in']").click();
+
+	}
+}

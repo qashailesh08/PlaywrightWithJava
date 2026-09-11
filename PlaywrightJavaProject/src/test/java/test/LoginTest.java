@@ -13,7 +13,7 @@ public class LoginTest extends Base {
 
 		LoginPage loginPage = new LoginPage(page);
 		loginPage.login("qa.shailesh08@gmail.com", "shaesh08");
-
+		webUtil.flushReport();
 //		String actualError = loginPage.getErrorMessage();
 //		Assert.assertEquals(actualError, "Invalid username or password");
 	}

@@ -3,13 +3,15 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="pages.DemoTest">
+      <class name="test.WindowHandleRun">
         <methods>
+          <include name="beforeSuite"/>
+          <include name="tearDown"/>
+          <include name="test_01_new_window"/>
           <include name="setUp"/>
-          <include name="test_001_demoBlaze"/>
-          <include name="tear_down"/>
+          <include name="afterSuite"/>
         </methods>
-      </class> <!-- pages.DemoTest -->
+      </class> <!-- test.WindowHandleRun -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->

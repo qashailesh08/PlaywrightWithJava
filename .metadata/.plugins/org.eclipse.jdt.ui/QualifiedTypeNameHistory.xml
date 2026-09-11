@@ -8,15 +8,11 @@
     <fullyQualifiedTypeName name="com.aventstack.extentreports.Status"/>
     <fullyQualifiedTypeName name="org.testng.annotations.Parameters"/>
     <fullyQualifiedTypeName name="com.aventstack.extentreports.util.Assert"/>
-    <fullyQualifiedTypeName name="com.microsoft.playwright.Playwright"/>
     <fullyQualifiedTypeName name="com.microsoft.playwright.BrowserType.LaunchOptions"/>
     <fullyQualifiedTypeName name="com.microsoft.playwright.BrowserType"/>
     <fullyQualifiedTypeName name="com.microsoft.playwright.Page.GetByRoleOptions"/>
     <fullyQualifiedTypeName name="com.microsoft.playwright.options.AriaRole"/>
-    <fullyQualifiedTypeName name="com.microsoft.playwright.Locator"/>
-    <fullyQualifiedTypeName name="org.testng.annotations.Test"/>
     <fullyQualifiedTypeName name="pages.DemoBlazeLoginPage"/>
-    <fullyQualifiedTypeName name="base.Base"/>
     <fullyQualifiedTypeName name="pages.AddToCard"/>
     <fullyQualifiedTypeName name="com.aventstack.extentreports.reporter.ExtentSparkReporter"/>
     <fullyQualifiedTypeName name="java.lang.Exception"/>
@@ -30,9 +26,14 @@
     <fullyQualifiedTypeName name="base.BaseTest"/>
     <fullyQualifiedTypeName name="freemarker.template.SimpleDate"/>
     <fullyQualifiedTypeName name="java.util.Date"/>
-    <fullyQualifiedTypeName name="com.microsoft.playwright.Page"/>
     <fullyQualifiedTypeName name="com.microsoft.playwright.Page.ScreenshotOptions"/>
     <fullyQualifiedTypeName name="java.nio.file.Paths"/>
-    <fullyQualifiedTypeName name="com.eva.webutil.WebUtil"/>
     <fullyQualifiedTypeName name="com.eva.webutil.getSnapeShots"/>
+    <fullyQualifiedTypeName name="com.microsoft.playwright.Locator"/>
+    <fullyQualifiedTypeName name="com.eva.webutil.WebUtil"/>
+    <fullyQualifiedTypeName name="base.Base"/>
+    <fullyQualifiedTypeName name="org.testng.annotations.Test"/>
+    <fullyQualifiedTypeName name="pages.HandleWindow"/>
+    <fullyQualifiedTypeName name="com.microsoft.playwright.Playwright"/>
+    <fullyQualifiedTypeName name="com.microsoft.playwright.Page"/>
 </qualifiedTypeNameHistroy>

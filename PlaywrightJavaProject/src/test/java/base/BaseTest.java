@@ -24,6 +24,7 @@ public class BaseTest {
 	protected Page page;
 	protected ExtentReports ext;
 	protected ExtentTest test;
+	protected WebUtil util;
 
 	@BeforeMethod
 	public void setUp(Method method) {
@@ -41,7 +42,11 @@ public class BaseTest {
 		if (report.getStatus() == ITestResult.FAILURE) {
 			System.out.println("Test Failed");
 			String snapPath = GetSnapeShots.getSnape(page, report.getName());
-			test.addScreenCaptureFromPath(snapPath);
+			String projectPath = System.getProperty("user.dir");
+			String fullPath = projectPath + "/" + snapPath;
+//			test.addScreenCaptureFromPath(fullPath + "shotes");
+			System.out.println("**** AbsuluteScreenShotePath" + fullPath);
+			test.addScreenCaptureFromPath(fullPath, "Shotes");
 		} else if (report.getStatus() == ITestResult.SUCCESS) {
 			System.out.println("Test Passed");
 		} else {

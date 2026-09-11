@@ -1,0 +1,19 @@
+package test;
+
+import org.testng.annotations.Test;
+
+import base.Base;
+import pages.HandleWindow;
+
+public class WindowHandleRun extends Base {
+
+	@Test(priority = 1)
+	public void test_01_new_window() {
+		webUtil.openUrl("https://testautomationpractice.blogspot.com/");
+		HandleWindow hd = new HandleWindow(page);
+		hd.handleNewWindow();
+		hd.SearchBox("Playwright");
+
+	}
+
+}

@@ -1,0 +1,33 @@
+package pages;
+
+import com.eva.webutil.WebUtil;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+
+public class HandleWindow {
+
+	protected Page page;
+	protected WebUtil util;
+	protected final Locator newWin;
+	protected final Locator searchBox;
+	protected final Locator searchButton;
+
+	public HandleWindow(Page page) {
+		this.page = page;
+		this.newWin = page.locator("//button[text()='New Tab']");
+		this.searchBox = page.locator("input[name='q']");
+		this.searchButton=page.locator("//input[@value='Search']");
+	}
+
+	public void verifyHomePageTitle() {
+		
+	}
+	public void handleNewWindow() {
+		page=this.util.switchToWindowByTitle("SDET-QA Blog: ISTQB");
+	}
+	
+	public void SearchBox(String searchItem) {
+		this.util.inputValue(newWin, searchItem, "Search Box");
+		this.util.click(searchButton, "Search Button");
+	}
+}

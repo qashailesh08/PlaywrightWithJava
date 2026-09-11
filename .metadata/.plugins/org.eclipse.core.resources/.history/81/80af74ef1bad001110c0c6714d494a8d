@@ -1,0 +1,13 @@
+package pages;
+
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+
+public class HandleWindow {
+	
+	protected Page page;
+	protected final Locator newWin;
+	public HandleWindow(Page page) {
+		this.page=page;
+	}
+}

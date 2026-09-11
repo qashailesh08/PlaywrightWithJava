@@ -14,7 +14,7 @@ public class GetSnapeShots {
 		DateFormat dfObj = new SimpleDateFormat("dd-MM-yyyy hh.mm.ss a");
 		String timeStm = dfObj.format(new Date());
 
-		String path = "test-output/" + testName + "_" + timeStm + ".png";
+		String path = "test-output/shotes/" + testName + "_" + timeStm + ".png";
 		page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get(path)).setFullPage(true));
 		return path;
 
